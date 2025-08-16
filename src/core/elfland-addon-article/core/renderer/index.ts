@@ -16,7 +16,6 @@ import json from 'highlight.js/lib/languages/json'
 import latex from 'highlight.js/lib/languages/latex'
 import python from 'highlight.js/lib/languages/python'
 import yaml from 'highlight.js/lib/languages/yaml'
-import hljsDefineVue from 'highlightjs-vue'
 
 hljs.registerLanguage('javascript', javascript)
 hljs.registerLanguage('typescript', typescript)
@@ -30,8 +29,52 @@ hljs.registerLanguage('json', json)
 hljs.registerLanguage('latex', latex)
 hljs.registerLanguage('python', python)
 hljs.registerLanguage('yaml', yaml)
-hljsDefineVue(hljs)
 hljs.registerLanguage('html', xml)
+hljs.registerLanguage('vue',  (hljs) => {
+  return {
+    subLanguage: 'xml',
+    contains: [
+      hljs.COMMENT('<!--', '-->', {
+        relevance: 10
+      }),
+      {
+        begin: /^(\s*)(<script setup>)/gm,
+        end: /^(\s*)(<\/script>)/gm,
+        subLanguage: 'javascript',
+        excludeBegin: true,
+        excludeEnd: true
+      },
+      {
+        begin: /^(\s*)(<script setup lang=["']ts["']>)/gm,
+        end: /^(\s*)(<\/script>)/gm,
+        subLanguage: 'typescript',
+        excludeBegin: true,
+        excludeEnd: true
+      },
+      {
+        begin: /^(\s*)(<style(\sscoped)?>)/gm,
+        end: /^(\s*)(<\/style>)/gm,
+        subLanguage: 'css',
+        excludeBegin: true,
+        excludeEnd: true
+      },
+      {
+        begin: /^(\s*)(<style lang=["'](scss|sass)["'](\sscoped)?>)/gm,
+        end: /^(\s*)(<\/style>)/gm,
+        subLanguage: 'scss',
+        excludeBegin: true,
+        excludeEnd: true
+      },
+      {
+        begin: /^(\s*)(<style lang=["']stylus["'](\sscoped)?>)/gm,
+        end: /^(\s*)(<\/style>)/gm,
+        subLanguage: 'stylus',
+        excludeBegin: true,
+        excludeEnd: true
+      }
+    ]
+  }
+})
 
 export class MdRenderer {
   static readonly CODE_SCROLL_KEY = 'md-code-scroll'

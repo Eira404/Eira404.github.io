@@ -145,7 +145,6 @@ function buildRES(isDev: boolean) {
   const assetFiles = fg.sync(`${MD_DIR}/assets/*`, { onlyFiles: true })
   assetFiles.forEach(f => {
     const tail = (f.split(/[/\\]/).pop()!).replace(/\ /g, '-')
-    console.log('tail', tail)
     if (bodyList.findIndex(b => b.includes(tail)) === -1) return
     const dest = resolve(outDir, 'assets', tail) // 自动处理空格/中文
     mkdirSync(resolve(outDir, 'assets'), { recursive: true }) // 再保险一次

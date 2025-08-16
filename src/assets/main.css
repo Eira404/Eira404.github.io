@@ -1,35 +1,47 @@
 @import './base.css';
+@import './css/index.css';
 
-#app {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  font-weight: normal;
+@import 'tailwindcss';
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  --color-elysia-500: #ff87c8;
+  --color-bg: #ffffff;
+  --color-bg-dark: #0a0a0a;
+  --color-moonlight-99: #e3f3ff;
+  --color-moonlight-100: #e8f7ff;
+  --color-moonlight-200: #c2e9ff;
+  --color-moonlight-300: #9cd7ff;
+  --color-moonlight-400: #75c3ff;
+  --color-moonlight-500: #4fadff;
+  --color-moonlight-600: #2994ff;
+  --color-moonlight-700: #1970d2;
+  --color-moonlight-800: #0d4fa6;
+  --color-moonlight-900: #053379;
+  --color-moonlight-950: #001c4d;
+  --color-moonlight-999: #192833;
 }
 
-a,
-.green {
-  text-decoration: none;
-  color: hsla(160, 100%, 37%, 1);
-  transition: 0.4s;
-  padding: 3px;
+@font-face {
+  font-family: HarmonyOS Sans;
+  src: url('./fonts//HarmonyOS_Sans_Regular.ttf');
 }
 
-@media (hover: hover) {
-  a:hover {
-    background-color: hsla(160, 100%, 37%, 0.2);
-  }
+body {
+  background-color: #FFFFFF;
+  font-family: HarmonyOS Sans;
 }
 
-@media (min-width: 1024px) {
+.dark {
   body {
-    display: flex;
-    place-items: center;
+    background-color: #0a0a0a;
   }
+}
 
-  #app {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    padding: 0 2rem;
+@layer components {
+  .a-link:hover {
+    text-decoration: underline;
+    color: #4fadff;
   }
 }

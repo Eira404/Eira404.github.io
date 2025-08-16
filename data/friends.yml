@@ -1,0 +1,6 @@
+- name: Alice
+  url: https://alice.dev
+  avatar: https://alice.dev/avatar.png
+- name: Bob
+  url: https://bob.com
+  avatar: https://bob.com/avatar.png

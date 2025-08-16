@@ -1,0 +1,36 @@
+- Sorted: [出版物, 研究项目, 个人项目, 其他]
+- name: Example
+  category: 出版物
+  author: 作者
+  contributors: [贡献者]
+  role: 角色
+  description: 描述
+  notes: 备注
+  url: 演示网页地址
+  github: github仓库地址
+  video: 演示视频地址
+  arxiv: arxiv地址
+  pinned: true
+- name: AIOps Arena （前端）（Developing）
+  category: 研究项目
+  description: 为南开大学软件学院<a class="a-link" href="https://nkcs.iops.ai/" target="_blank">AIOps实验室</a>的微服务系统管理；数据获取、可视化；故障、数据集、模型、算法管理；算法排名网站，进行Vue3+TS重构。
+  url: https://microservo.aiops.cn/
+  github: https://github.com/Eira404/AIOpsArena-frontend
+  pinned: true
+- name: Arcaea Web版
+  category: 研究项目
+  contributors: [https://github.com/Eira404, https://github.com/nkuAlexLee, https://github.com/ShmilyYuQAQ]
+  role: 负责人
+  description: 本项目在网页实现一款音乐游戏，此项目是南开大学2023年前端开发实训课程设计，只用于自我学习，不会进行商用。此版本的功能包括注册、登录、添加好友、选择搭档、选择曲包、选择歌曲、机器自动游玩、潜力值计算、残片计算等，暂时不支持玩家游玩。此逻辑判定代码已经完成，但并没有接入到此版本中。
+  notes: 本项目所使用的音频、图片、字体、设计等均来自Arcaea游戏的拆包，本人不持有该项目所涉及到的音频、图片、字体等素材，音频、图片、字体版权为lowiro或其他公司所有，仅代码为自己编写，侵权联系我进行删除。
+  github: https://github.com/Eira404/QVJDQUVB
+  video: https://www.bilibili.com/video/BV16N41117xb
+  pinned: true
+- name: SakuraRenderer 前端文本渲染器
+  category: 研究项目
+  contributors: [https://github.com/Eira404, https://github.com/nkuAlexLee, https://github.com/mianmaner, https://github.com/ShmilyYuQAQ]
+  role: 负责人
+  description: 这是一款基于 vue3 开发的简易前端文本渲染器，由用户提供文章，前端进行渲染。语法类似于Markdown，在编写文章方面基本上不需要html代码。支持多种模板语法，为用户提供一个简单美观的文本渲染器。
+  notes: 软件工程课程设计，做来感受软件工程的学习以及尝试使用编译原理的知识解析文章（最后还是放弃了QAQ，写完之后看markdown-it的源代码才发现我想的太复杂了）。之后转战写markdown-it插件了（好玩爱玩）。
+  github: https://github.com/Eira404/SakuraRendererVue
+  pinned: true

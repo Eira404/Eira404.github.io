@@ -1,0 +1,175 @@
+{
+  "docs": [
+    {
+      "id": 2,
+      "title": "markdown-it-component",
+      "titlePinYin": "markdown-it-component",
+      "path": "markdown-it-component",
+      "author": "Eira404",
+      "body": "# markdown-it-component\n> 为Markdown编写的的组件插件，可以自定义插件实现的具体功能。\n\n默认组件格式如下：\n```md\n{|name|config1|config2=xxx|config3=a,b,c...\n|-\ndata1\n|-\ndata2\n|}\n```\n::: tip\n组件之间可以嵌套\n:::\n## 安装\n## API\n```js\nvar md = require('markdown-it')()\n            .use(require('markdown-it-component'), name [, options]);\n```\n## 基础用法\n使用该插件必须要填写自定义的模板名称和渲染函数。\n使用方法和{{link|markdown-it-template}}基本相同，这里不再赘述。\n下面给出一个实现分组组件的方法。\n{|classify|classifies=源代码,MD代码,效果\n|-\n```ts\nimport MarkdownItComponent from 'markdown-it-component'\nimport type Token from 'markdown-it/lib/token.mjs'\n\nmd.use(MarkdownItComponent, 'classify', {\n  render: function (tokens: Token[], idx: number) {\n    const token = tokens[idx]\n    if (token.nesting === 1) {\n      const name = Math.floor(Math.random() * 1000000).toString()\n      const configs = token.meta.configs\n      const classifies = configs.classifies || []\n      let inputs = ''\n      classifies.forEach((c: string, i: number) => {\n        const t =\n          '<div><label><input type=\"radio\" name=\"' +\n          name +\n          '\" value=\"' +\n          i.toString() +\n          '\" hidden ' +\n          (i === 0 ? 'checked' : '') +\n          '> ' +\n          c +\n          '</label></div>'\n        inputs += t\n      })\n      // opening tag\n      return (\n        '<div class=\"markdown-it-component-classify-container\">\\n<div class=\"markdown-it-component-classify\">\\n<div head>\\n' +\n        inputs +\n        '\\n</div>\\n<div body>\\n<div>\\n'\n      )\n    } else {\n      // closing tag\n      return '</div>\\n</div>\\n</div>\\n</div>\\n'\n    }\n  },\n  renderDivision: function (tokens: Token[], idx: number) {\n    return '</div>\\n<div>\\n'\n  },\n  init: function (options: ComponentPluginOptions) {\n    const size = 10\n    const styleId = 'markdown-it-classify-style'\n    let styleBase = `\n.markdown-it-component-classify-container {\nborder-radius: 8px;\nborder: 1px solid var(--bl-color-base-border);\noverflow: hidden;\nmargin-bottom: 1rem;\n}\n.markdown-it-component-classify > div > div {\nposition: relative;\n}\n.markdown-it-component-classify > div[body] > div {\ndisplay: none;\npadding: 0.5rem;\n}\n.markdown-it-component-classify > div[head] {\ndisplay: flex;\nflex-wrap: wrap;\nbackground-color: var(--bl-color-light-fill);\n}\n.markdown-it-component-classify > div[head] > div > label {\npadding: 0.5rem 1rem;\ncursor: pointer;\ntransition: color 0.2s;\nbox-sizing: border-box;\ndisplay: block;\nfont-weight: bold;\ncolor: var(--bl-color-secondary-text);\n}\n.markdown-it-component-classify > div[head] > div:nth-child(n + 2)::before {\ncontent: '';\nposition: absolute;\ntop: 50%;\ntransform: translateY(-50%) translateX(-50%);\nwidth: 1px;\nheight: 40%;\nbackground-color: var(--bl-color-primary-text);\n}\n.markdown-it-component-classify > div[head] > div > label:has(input:checked) {\ntransition: color 0.2s;\ncolor: var(--bl-color-primary-text);\n}\n.markdown-it-component-classify > div[head] > div > label:hover {\ntransition: color 0.2s;\ncolor: var(--bl-color-primary-text);\n}\n.markdown-it-component-classify > div[body] > div > *:last-child {\nmargin-bottom: 0 !important;\n}\n\n    `\n    for (let i = 1; i <= size; i++) {\n      if (i > 1) styleBase += ',\\n'\n      styleBase += `.markdown-it-component-classify:has( > div[head] > div:nth-child(${i}) > label > input:checked) > div[body] > div:nth-child(${i})`\n    }\n    styleBase += ` {\ndisplay: block;\n}\n    `\n    if (!document.getElementById(styleId)) {\n      const style = document.createElement('style')\n      style.setAttribute('id', styleId)\n      style.setAttribute('type', 'text/css')\n      style.innerHTML = styleBase.trim()\n      const head = document.head || document.getElementsByTagName('head')[0]\n      head.appendChild(style)\n    }\n  },\n  configKeys: ['classifies']\n})\n```\n|-\n```md\n{|classify|classifies=中文,English,Français\n|-\n你好世界！\n|-\nHello world!\n|-\nBonjour le monde!\n|}\n```\n|-\n{|classify|classifies=中文,English,Français\n|-\n你好世界！\n|-\nHello world!\n|-\nBonjour le monde!\n|}\n|}\n## 参数\n- name - 组件名称（必填），字符串或数组，用于组件识别，*组件名字请不要重复*\n可选参数:\n\n|      属性名       |          说明           |                                           类型                                           |  默认值  |\n| :------------: | :-------------------: | :------------------------------------------------------------------------------------: | :---: |\n|    useEqual    | 组件配置项是否启用 `=` 进行配置项赋值 |                                       `boolean`                                        | true  |\n|    useIndex    |    组件配置项是否启用下标顺序判定    |                                       `boolean`                                        | false |\n|   configKeys   |     配置项的键值，便于数据读取     |                                       `string[]`                                       |  []   |\n|     render     |        自定义渲染函数        | `(tokens: Token[], idx: number, _options: Options, env: any, slf: Renderer) => string` |   -   |\n| renderDivision |       自定义分割渲染函数       | `(tokens: Token[], idx: number, _options: Options, env: any, slf: Renderer) => string` |   -   |\n|      init      |       自定义初始化函数        |                               (options: Options) => void                               |   -   |\n|  markerBegin   |       组件起始匹配标识符       |                                        `string`                                        |  {\\|  |\n|   markerEnd    |       组件结束匹配标识符       |                                        `string`                                        |  \\|}  |\n|  dataDivision  |     组件数据项分隔匹配标识符      |                                        `string`                                        |  \\|-  |\n| configDivision |     组件配置项分隔匹配标识符      |                                        `string`                                        |  \\|   |\n## 源代码\n## 许可证\nMIT",
+      "categories": [
+        "项目",
+        "前端",
+        "Markdown插件"
+      ],
+      "tags": [
+        "Markdown",
+        "Plugin",
+        "markdown-it-component",
+        "测试",
+        "介绍"
+      ],
+      "links": [
+        "markdown-it-template"
+      ],
+      "created": "2025-08-15T05:46:55.719Z",
+      "modified": "2025-08-16T02:49:52.171Z"
+    },
+    {
+      "id": 3,
+      "title": "markdown-it-template",
+      "titlePinYin": "markdown-it-template",
+      "path": "markdown-it-template",
+      "author": "Eira404",
+      "body": "\n# markdown-it-template\n> 为Markdown编写的的模板插件，可以自定义插件实现的具体功能。\n\n默认模板格式如下：`{{name|some words ....|config1|config2=xxx|config3=a,b,c,...}}`\n::: tip\n模板之间可以嵌套\n:::\n## 安装\n## API\n```js\nvar md = require('markdown-it')()\n            .use(require('markdown-it-template'), name [, options]);\n```\n## 基础用法\n使用该插件必须要填写自定义的模板名称和渲染函数。\n`render`方法是核心绘制方法，其接收token列表和idx，获取当前token只需按照如下代码即可。在此示例中，展示了确定是*opening tag*和*closing tag*的方法，以及获取用户输入的配置项`configs`。`configs`格式为：`Record<string, string[]>`。如果用户没有填写配置项，或填写了错误的配置项，`configs`均不会有相关数据。\n{|classify|classifies=源代码,MD代码,效果\n|-\n```ts\nimport MarkdownItTemplate from 'markdown-it-template'\nimport type Token from 'markdown-it/lib/token.mjs'\n\nmd.use(templatePlugin, 'template-name-1', {\n  configKeys: ['type'],\n  render: function (tokens: Token[], idx: number) {\n    const token = tokens[idx]\n    const colorDict: Record<string, string> = {\n      default: 'transparent',\n      warning: '#F56C6C',\n      success: '#67C23A'\n    }\n    if (token.nesting === 1) {\n      // opening tag\n      const configs = token.meta.configs\n      // 用户配置项\n      console.log(configs)\n      const colorType = (configs['type'] && configs['type'][0]) || 'default'\n      const color = colorDict[colorType.trim()] || colorType.trim()\n      const style = `background-color: ${color};`\n      return `<span style=\"${style}\">`\n    } else {\n      // closing tag\n      return '</span>'\n    }\n  }\n})\n\nconsole.log(md.render('{{template-name-1|warning content|type=warning}}'))\n\n// Output:\n//\n// {\"type\": [\"warning\"]}\n//\n// <span style=\"background-color: #F56C6C;\">warning content</span>\n\nconsole.log(md.render('{{template-name-1|warning content}}'))\n\n// Output:\n//\n// {}\n//\n// <span style=\"background-color: transparent;\">warning content</span>\n```\n|-\n```md\n{{template-name-1|warning content|type=warning}}\n\n{{template-name-1|warning content}}\n```\n|-\n{{template-name-1|warning content|type=warning}}\n\n{{template-name-1|warning content}}\n|}\n\n## 多配置项与配置项多值\n`configKeys`参数接收一个字符串数组，其内部参数为配置项对应的键值。当为插件配置多个配置项时，配置项之间通过`|`分隔。当为一个配置项赋多个值时，值与值之间用英文逗号`,`分隔。\n{|classify|classifies=源代码,MD代码,效果\n|-\n```ts\nmd.use(templatePlugin, 'template-name-2', {\n  configKeys: ['chars', 'color'],\n  render: function (tokens: Token[], idx: number) {\n    const token = tokens[idx]\n    if (token.nesting === 1) {\n      // opening tag\n      const configs = token.meta.configs\n      console.log(configs)\n      const charsConf = (configs['chars']) || []\n      const color = (configs['color']) || ''\n      const chars = charsConf.join('-')\n      return `<span style=\"color: ${color}\">${chars}`\n    } else {\n      // closing tag\n      return '</span>'\n    }\n  }\n})\n\nconsole.log(md.render('{{template-name-2|content|chars=a,b,c,d,e|color=red}}'))\n\n// Output:\n//\n// {\"chars\": [\"a\", \"b\", \"c\", \"d\", \"e\"], \"color\": [\"red\"]}\n//\n// <span style=\"color: red\">a-b-c-d-econtent</span>\n```\n|-\n```md\n{{template-name-2|content|chars=a,b,c,d,e|color=red}}\n```\n|-\n{{template-name-2|content|chars=a,b,c,d,e|color=red}}\n|}\n::: tip\n使用`=`赋值时不需要在意书写顺序\n``` md\n{{template-name-2|content|color=red|chars=a,b,c,d,e}}\n```\n{{template-name-2|content|color=red|chars=a,b,c,d,e}}\n:::\n## 配置项赋值方式\n配置项默认使用`=`赋值，设置`useIndex = true`后支持通过下标确定配置项名称进行赋值。\n{|classify|classifies=源代码,MD代码,效果\n|-\n```ts\nmd.use(templatePlugin, 'template-name-3', {\n  configKeys: ['chars', 'color'],\n  useIndex: true,\n  render: function (tokens: Token[], idx: number) {\n    // 同 template-name-2\n  }\n})\n\n// 此处不需要使用chars=a,b,c,d,e|color=red\nconsole.log(md.render('{{template-name-3|content|a,b,c,d,e|red}}'))\n\n// Output:\n//\n// {\"chars\": [\"a\", \"b\", \"c\", \"d\", \"e\"], \"color\": [\"red\"]}\n//\n// <span style=\"color: red\">a-b-c-d-econtent</span>\n```\n|-\n```md\n{{template-name-3|content|a,b,c,d,e|red}}\n```\n|-\n{{template-name-3|content|a,b,c,d,e|red}}\n|}\n直接填写的赋值顺寻的按照`configKeys`进行，如果希望直接赋值，可以使用`index=value`进行。\n{|classify|classifies=MD代码,效果\n|-\n```md\n{{template-name-3|content|1=red|0=a,b,c,d,e}}\n```\n|-\n{{template-name-3|content|1=red|0=a,b,c,d,e}}\n|}\n## Tokenize解析位置\nTokenize解析位置代表继续使用Markdown解析的位置，位置划分如下：`{{位置0|位置1|位置2|位置3|...}}`。位置0代表模板名字，此位置无法被Tokenize解析。默认情况位置一是唯一被Tokenize解析的位置。Tokenize解析位置通过`tokenizePos`控制，其接收一个`number[] | boolean`参数，`true`代表全部被解析，`false`等价于`[1]`，不被解析的位置会尝试解析为配置项，成功后放入`configs`。\n{|classify|classifies=源代码,MD代码,效果\n|-\n```ts\nmd.use(templatePlugin, 'template-name-4', {\n  configKeys: ['chars', 'color'],\n  tokenizePos: [], // 全部禁止解析\n  render: function (tokens: Token[], idx: number) {\n    // 同 template-name-2\n  }\n})\n\nconsole.log(md.render('{{template-name-2|chars=a,b,c,d,e|color=red}}'))\n\n// Output:\n//\n// {\"chars\": [\"a\", \"b\", \"c\", \"d\", \"e\"], \"color\": [\"red\"]}\n//\n// <span style=\"color: red\">a-b-c-d-e</span>\n```\n|-\n```md\n{{template-name-4|chars=a,b,c,d,e|color=red}}\n```\n|-\n{{template-name-4|chars=a,b,c,d,e|color=red}}\n|}\n需要注意的是，如果`tokenizePos`解析位置超过一个，就需要编写`renderDivision`方法。\n{|classify|classifies=源代码,CSS,MD代码,效果\n|-\n```ts\nmd.use(templatePlugin, 'tran', {\n  useIndex: true,\n  configKeys: ['from', 'to'],\n  render: function (tokens: Token[], idx: number) {\n    const token = tokens[idx]\n    if (token.nesting === 1) {\n      const name = Math.floor(Math.random() * 1000000).toString()\n      const configs = token.meta.configs\n      const from = (configs['from'] && configs['from'][0]) || '原文:'\n      const to = (configs['to'] && configs['to'][0]) || '译文:'\n      const input = `<label data-from=\"${from}\" data-to=\"${to}\" class=\"md-template-translate__label\"><input type=\"checkbox\" name=\"${name}\" hidden ></label>`\n      return '<span class=\"md-template-translate\">' + input + '<span>'\n    } else {\n      return '</span></span>'\n    }\n  },\n  renderDivision: function (token: Token[], idx: number) {\n    return '</span><span>'\n  },\n  tokenizePos: [1, 2]\n})\n```\n|-\n```css\n.md-template-translate > span:nth-of-type(2) {\n  display: none;\n}\n.md-template-translate:has(> label > input:checked) > span:nth-of-type(2) {\n  display: inline;\n}\n.md-template-translate:has(> label > input:checked) > span:nth-of-type(1) {\n  display: none;\n}\n.md-template-translate__label {\n  cursor: pointer;\n  user-select: none;\n  margin-right: 0.5rem;\n  font-weight: bold;\n  transition: color 0.2s;\n}\n.md-template-translate__label:hover {\n  transition: color 0.2s;\n  color: var(--bl-color-md-github-base);\n}\n.md-template-translate__label:after {\n  content: attr(data-from);\n}\n.md-template-translate__label:has(input:checked):after {\n  content: attr(data-to);\n}\n```\n|-\n```md\n{{tran|hello world!|你好世界！}}（点击“原文”、“译文”）\n```\n|-\n{{tran|hello world!|你好世界！}}（点击“原文”、“译文”）\n|}\n## 自定义模板匹配标识符\n模板默认使用`{{`标识模板开始、使用`}}`标识模板结束、使用`|`标识模板配置项分隔。可以通过`markerBegin`、`markerEnd`、`markerDivision`进行修改。\n::: warning\n非必要还是不去修改比较好\n:::\n## 参数\n- name - 模板名称（必填），字符串或数组，用于模板识别，*模板名字请不要重复*\n可选参数:\n\n|      属性名       |          说明           |                                           类型                                           |  默认值  |\n| :------------: | :-------------------: | :------------------------------------------------------------------------------------: | :---: |\n|    useEqual    | 模板配置项是否启用 `=` 进行配置项赋值 |                                       `boolean`                                        | true  |\n|    useIndex    |    模板配置项是否启用下标顺序判定    |                                       `boolean`                                        | false |\n|   configKeys   |     配置项的键值，便于数据读取     |                                       `string[]`                                       |  []   |\n|     render     |        自定义渲染函数        | `(tokens: Token[], idx: number, _options: Options, env: any, slf: Renderer) => string` |   -   |\n| renderDivision |       自定义分割渲染函数       | `(tokens: Token[], idx: number, _options: Options, env: any, slf: Renderer) => string` |   -   |\n|  markerBegin   |       模板起始匹配标识符       |                                        `string`                                        |  {{   |\n|   markerEnd    |       模板结束匹配标识符       |                                        `string`                                        |  }}   |\n| markerDivision |     模板配置项分隔匹配标识符      |                                        `string`                                        |  \\|   |\n## 源代码\n## 许可证\nMIT",
+      "categories": [
+        "项目",
+        "前端",
+        "Markdown插件"
+      ],
+      "tags": [
+        "Markdown",
+        "Plugin",
+        "markdown-it-template",
+        "测试",
+        "介绍"
+      ],
+      "links": [],
+      "created": "2025-08-14T13:50:28.503Z",
+      "modified": "2025-08-16T03:38:24.464Z"
+    }
+  ],
+  "friends": [
+    {
+      "name": "Alice",
+      "url": "https://alice.dev",
+      "avatar": "https://alice.dev/avatar.png"
+    },
+    {
+      "name": "Bob",
+      "url": "https://bob.com",
+      "avatar": "https://bob.com/avatar.png"
+    }
+  ],
+  "projects": [
+    {
+      "Sorted": [
+        "出版物",
+        "研究项目",
+        "个人项目",
+        "其他"
+      ]
+    },
+    {
+      "name": "Example",
+      "category": "出版物",
+      "author": "作者",
+      "contributors": [
+        "贡献者"
+      ],
+      "role": "角色",
+      "description": "描述",
+      "notes": "备注",
+      "url": "演示网页地址",
+      "github": "github仓库地址",
+      "video": "演示视频地址",
+      "arxiv": "arxiv地址",
+      "pinned": true
+    },
+    {
+      "name": "AIOps Arena （前端）（Developing）",
+      "category": "研究项目",
+      "description": "为南开大学软件学院<a class=\"a-link\" href=\"https://nkcs.iops.ai/\" target=\"_blank\">AIOps实验室</a>的微服务系统管理；数据获取、可视化；故障、数据集、模型、算法管理；算法排名网站，进行Vue3+TS重构。",
+      "url": "https://microservo.aiops.cn/",
+      "github": "https://github.com/Eira404/AIOpsArena-frontend",
+      "pinned": true
+    },
+    {
+      "name": "Arcaea Web版",
+      "category": "研究项目",
+      "contributors": [
+        "https://github.com/Eira404",
+        "https://github.com/nkuAlexLee",
+        "https://github.com/ShmilyYuQAQ"
+      ],
+      "role": "负责人",
+      "description": "本项目在网页实现一款音乐游戏，此项目是南开大学2023年前端开发实训课程设计，只用于自我学习，不会进行商用。此版本的功能包括注册、登录、添加好友、选择搭档、选择曲包、选择歌曲、机器自动游玩、潜力值计算、残片计算等，暂时不支持玩家游玩。此逻辑判定代码已经完成，但并没有接入到此版本中。",
+      "notes": "本项目所使用的音频、图片、字体、设计等均来自Arcaea游戏的拆包，本人不持有该项目所涉及到的音频、图片、字体等素材，音频、图片、字体版权为lowiro或其他公司所有，仅代码为自己编写，侵权联系我进行删除。",
+      "github": "https://github.com/Eira404/QVJDQUVB",
+      "video": "https://www.bilibili.com/video/BV16N41117xb",
+      "pinned": true
+    },
+    {
+      "name": "SakuraRenderer 前端文本渲染器",
+      "category": "研究项目",
+      "contributors": [
+        "https://github.com/Eira404",
+        "https://github.com/nkuAlexLee",
+        "https://github.com/mianmaner",
+        "https://github.com/ShmilyYuQAQ"
+      ],
+      "role": "负责人",
+      "description": "这是一款基于 vue3 开发的简易前端文本渲染器，由用户提供文章，前端进行渲染。语法类似于Markdown，在编写文章方面基本上不需要html代码。支持多种模板语法，为用户提供一个简单美观的文本渲染器。",
+      "notes": "软件工程课程设计，做来感受软件工程的学习以及尝试使用编译原理的知识解析文章（最后还是放弃了QAQ，写完之后看markdown-it的源代码才发现我想的太复杂了）。之后转战写markdown-it插件了（好玩爱玩）。",
+      "github": "https://github.com/Eira404/SakuraRendererVue",
+      "pinned": true
+    }
+  ],
+  "about": {
+    "name": "Eira404",
+    "position": "TianJin , China",
+    "avater": "/data/imgs/aila.jpg",
+    "about": [
+      "Developer",
+      "Hi there! 👋 I'm Eira404."
+    ],
+    "github": "https://github.com/Eira404",
+    "skills": [
+      {
+        "name": "Web",
+        "details": [
+          "Vue.js",
+          "TypeScript",
+          "React.js",
+          "Tailwindcss",
+          "HTML",
+          "JavaScript",
+          "CSS"
+        ]
+      },
+      {
+        "name": "Progarmming",
+        "details": [
+          "Python",
+          "C++",
+          "C",
+          "MySQL"
+        ]
+      }
+    ],
+    "links": [
+      {
+        "name": "哔哩哔哩",
+        "link": "https://space.bilibili.com/543157486",
+        "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\"><path fill=\"currentColor\" d=\"M7.172 2.757L10.414 6h3.171l3.243-3.242a1 1 0 1 1 1.415 1.414L16.414 6H18.5A3.5 3.5 0 0 1 22 9.5v8a3.5 3.5 0 0 1-3.5 3.5h-13A3.5 3.5 0 0 1 2 17.5v-8A3.5 3.5 0 0 1 5.5 6h2.085L5.757 4.171a1 1 0 0 1 1.415-1.414ZM18.5 8h-13a1.5 1.5 0 0 0-1.493 1.355L4 9.5v8a1.5 1.5 0 0 0 1.356 1.493L5.5 19h13a1.5 1.5 0 0 0 1.493-1.356L20 17.5v-8A1.5 1.5 0 0 0 18.5 8ZM8 11a1 1 0 0 1 1 1v2a1 1 0 1 1-2 0v-2a1 1 0 0 1 1-1Zm8 0a1 1 0 0 1 1 1v2a1 1 0 1 1-2 0v-2a1 1 0 0 1 1-1Z\"></path></svg>",
+        "color": "rgb(0, 161, 214)"
+      },
+      {
+        "name": "Github",
+        "link": "https://github.com/Eira404",
+        "svg": "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' width='24' height='24'><g fill='currentColor'><path d='m12.593 23.258l-.011.002l-.071.035l-.02.004l-.014-.004l-.071-.035q-.016-.005-.024.005l-.004.01l-.017.428l.005.02l.01.013l.104.074l.015.004l.012-.004l.104-.074l.012-.016l.004-.017l-.017-.427q-.004-.016-.017-.018m.265-.113l-.013.002l-.185.093l-.01.01l-.003.011l.018.43l.005.012l.008.007l.201.093q.019.005.029-.008l.004-.014l-.034-.614q-.005-.018-.02-.022m-.715.002a.02.02 0 0 0-.027.006l-.006.014l-.034.614q.001.018.017.024l.015-.002l.201-.093l.01-.008l.004-.011l.017-.43l-.003-.012l-.01-.01z'/><path fill='currentColor' d='M6.315 6.176c-.25-.638-.24-1.367-.129-2.034a6.8 6.8 0 0 1 2.12 1.07c.28.214.647.283.989.18A9.3 9.3 0 0 1 12 5c.961 0 1.874.14 2.703.391c.342.104.709.034.988-.18a6.8 6.8 0 0 1 2.119-1.07c.111.667.12 1.396-.128 2.033c-.15.384-.075.826.208 1.14C18.614 8.117 19 9.04 19 10c0 2.114-1.97 4.187-5.134 4.818c-.792.158-1.101 1.155-.495 1.726c.389.366.629.882.629 1.456v3a1 1 0 0 0 2 0v-3c0-.57-.12-1.112-.334-1.603C18.683 15.35 21 12.993 21 10c0-1.347-.484-2.585-1.287-3.622c.21-.82.191-1.646.111-2.28c-.071-.568-.17-1.312-.57-1.756c-.595-.659-1.58-.271-2.28-.032a9 9 0 0 0-2.125 1.045A11.4 11.4 0 0 0 12 3c-.994 0-1.953.125-2.851.356a9 9 0 0 0-2.125-1.045c-.7-.24-1.686-.628-2.281.031c-.408.452-.493 1.137-.566 1.719l-.005.038c-.08.635-.098 1.462.112 2.283C3.484 7.418 3 8.654 3 10c0 2.992 2.317 5.35 5.334 6.397A4 4 0 0 0 8 17.98l-.168.034c-.717.099-1.176.01-1.488-.122c-.76-.322-1.152-1.133-1.63-1.753c-.298-.385-.732-.866-1.398-1.088a1 1 0 0 0-.632 1.898c.558.186.944 1.142 1.298 1.566c.373.448.869.916 1.58 1.218c.682.29 1.483.393 2.438.276V21a1 1 0 0 0 2 0v-3c0-.574.24-1.09.629-1.456c.607-.572.297-1.568-.495-1.726C6.969 14.187 5 12.114 5 10c0-.958.385-1.881 1.108-2.684c.283-.314.357-.756.207-1.14'/></g></svg>",
+        "color": "rgb(24, 23, 23)"
+      }
+    ]
+  }
+}

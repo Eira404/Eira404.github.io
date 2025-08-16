@@ -28,3 +28,4 @@ coverage
 
 test.*
 .vscode
+.env.production

@@ -1,0 +1,85 @@
+html {
+  --bl-color-basic-black: #000000;
+  --bl-color-basic-white: #ffffff;
+  --bl-color-basic-transparent: #00000000;
+  --bl-color-base-background: #ffffff;
+  --bl-color-page-background: #f2f3f5;
+
+  --bl-color-darker-fill: #e6e8eb;
+  --bl-color-dark-fill: #ebedf0;
+  --bl-color-base-fill: #f0f2f5;
+  --bl-color-light-fill: #f5f7fa;
+  --bl-color-lighter-fill: #fafafa;
+  --bl-color-extra-light-fill: #fafcff;
+  --bl-color-blank-fill: #ffffff;
+
+  --bl-color-darker-border: #cdd0d6;
+  --bl-color-dark-border: #d4d7de;
+  --bl-color-base-border: #dcdfe6;
+  --bl-color-light-border: #e4e7ed;
+  --bl-color-lighter-border: #ebeef5;
+  --bl-color-extra-light-border: #f2f6fc;
+
+  --bl-color-primary-text: #303133;
+  --bl-color-regular-text: #606266;
+  --bl-color-secondary-text: #909399;
+  --bl-color-placeholder-text: #a8abb2;
+  --bl-color-diblbled-text: #c0c4cc;
+
+  --bl-shadow-t: 0px 0px 0px 0px #ffffff00;
+  --bl-shadow-01: 0 1px 2px #2b2a330d;
+  --bl-shadow-02: 0 1px 6px #2b2a331a;
+  --bl-shadow-03: 0px 4px 16px 0px #2b2a331a;
+
+  /* --bl-elysia-base: #F4C8E9; */
+  --bl-elysia-base: #ffd6fb;
+  --bl-elysia-dark: #f7a1e2;
+  --bl-elysia-background-color: #f4c8e930;
+
+  --bl-moonlight-blue-1: #e8f7ff;
+  --bl-moonlight-blue-2: #c2e9ff;
+  --bl-moonlight-blue-3: #9cd7ff;
+  --bl-moonlight-blue-4: #75c3ff;
+  --bl-moonlight-blue-5: #4fadff;
+  --bl-moonlight-blue-6: #2994ff;
+  --bl-moonlight-blue-7: #1970d2;
+  --bl-moonlight-blue-8: #0d4fa6;
+  --bl-moonlight-blue-9: #053379;
+  --bl-moonlight-blue-10: #001c4d;
+
+  --bl-color-success-base: #67c23a;
+  --bl-color-success-dark-2: #529b2e;
+  --bl-color-success-light-3: #95d475;
+  --bl-color-success-light-5: #b3e19d;
+  --bl-color-success-light-7: #d1edc4;
+  --bl-color-success-light-8: #e1f3d8;
+  --bl-color-success-light-9: #f0f9eb;
+
+  --bl-color-warning-base: #e6a23c;
+  --bl-color-warning-dark-2: #b88230;
+  --bl-color-warning-light-3: #eebe77;
+  --bl-color-warning-light-5: #f3d19e;
+  --bl-color-warning-light-7: #f8e3c5;
+  --bl-color-warning-light-8: #faecd8;
+  --bl-color-warning-light-9: #fdf6ec;
+
+  --bl-color-danger-base: #f56c6c;
+  --bl-color-danger-dark-2: #c45656;
+  --bl-color-danger-light-3: #f89898;
+  --bl-color-danger-light-5: #fab6b6;
+  --bl-color-danger-light-7: #fcd3d3;
+  --bl-color-danger-light-8: #fde2e2;
+  --bl-color-danger-light-9: #fef0f0;
+
+  --bl-color-info-base: #909399;
+  --bl-color-info-dark-2: #73767a;
+  --bl-color-info-light-3: #b1b3b8;
+  --bl-color-info-light-5: #c8c9cc;
+  --bl-color-info-light-7: #dedfe0;
+  --bl-color-info-light-8: #e9e9eb;
+  --bl-color-info-light-9: #f4f4f5;
+
+  --bl-link-background-color: #4fadff30;
+  --bl-link-button-background-color: #4fadff30;
+  --bl-selected-background-color: #4fadff30;
+}

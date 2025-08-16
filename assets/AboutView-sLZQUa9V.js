@@ -1,0 +1,1 @@
+import{_ as t}from"./index-C0CPvlxq.js";import{L as e,O as r,o as s}from"./vendor-CaMKibFP.js";import"./echarts-Bz-baRhQ.js";import"./zrender-D2u50Vyc.js";import"./katex-BE-lP2O7.js";const a={},n={class:"about"};function i(c,o){return s(),e("div",n,o[0]||(o[0]=[r("h1",null,"This is an about page",-1)]))}const u=t(a,[["render",i]]);export{u as default};

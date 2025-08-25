@@ -1,2 +1,0 @@
-import{_ as e}from"./index.vue_vue_type_script_setup_true_lang-p629ok6l.js";import{M as t}from"./index-Cnd5TCzV.js";import{ad as n,ag as c,aj as s,al as a,as as r,ah as _}from"./vendor-BT9nRNHj.js";const i={class:"sticky top-0 z-10 w-full box-content"},l={class:"h-14"},d={class:"max-w-[1000px] mx-auto"},v=n({__name:"default",setup(m){return(o,p)=>(_(),c("div",null,[s("div",i,[s("div",l,[a(e)])]),s("div",d,[r(o.$slots,"main")]),s("div",null,[a(t)])]))}});export{v as _};
-//# sourceMappingURL=default.vue_vue_type_script_setup_true_lang-CsrtEwfK.js.map

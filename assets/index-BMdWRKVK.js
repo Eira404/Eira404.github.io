@@ -1,0 +1,2 @@
+import{_ as s}from"./_plugin-vue_export-helper-DlAUqK2U.js";import{a7 as a,a8 as o,aa as e,ak as r}from"./vendor-lsvYFlz-.js";const n={},l={class:"border-t p-6 border-black/20 dark:border-white/20"},c={class:"mx-auto max-w-[1500px] flex justify-between items-start"},i={class:"flex items-center gap-2"};function d(_,t){return o(),a("footer",l,[e("div",c,[e("div",i,[e("span",null,"© 2025-"+r(new Date().getFullYear()),1),t[0]||(t[0]=e("span",null,"Eira404's Elfland",-1))])])])}const m=s(n,[["render",d]]);export{m as M};
+//# sourceMappingURL=index-BMdWRKVK.js.map

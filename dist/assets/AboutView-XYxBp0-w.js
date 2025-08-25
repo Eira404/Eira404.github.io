@@ -1,0 +1,2 @@
+import{_ as t}from"./_plugin-vue_export-helper-DlAUqK2U.js";import{ag as e,aj as a,ah as r}from"./vendor-BT9nRNHj.js";import"./@pixi-C5ejRgxM.js";import"./typescript-CGIBXAIw.js";import"./@codemirror-N9FfqkES.js";const s={},n={class:"about"};function i(c,o){return r(),e("div",n,o[0]||(o[0]=[a("h1",null,"This is an about page",-1)]))}const u=t(s,[["render",i]]);export{u as default};
+//# sourceMappingURL=AboutView-XYxBp0-w.js.map

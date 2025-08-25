@@ -4,6 +4,7 @@ import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import vueDevTools from 'vite-plugin-vue-devtools'
 import tailwindcss from '@tailwindcss/vite'
+import { nodePolyfills } from 'vite-plugin-node-polyfills'
 
 import { buildMdRES, copy404 } from './vite.config.helper'
 
@@ -26,10 +27,20 @@ export default defineConfig({
       ]
     }
   },
-  plugins: [vue(), vueDevTools(), tailwindcss(), copy404(), buildMdRES()],
+  plugins: [
+    vue(),
+    vueDevTools(),
+    tailwindcss(),
+    copy404(),
+    buildMdRES(),
+    nodePolyfills({
+      protocolImports: true // 兼容 node:xxx 这种导入
+    })
+  ],
   resolve: {
     alias: {
-      '@': fileURLToPath(new URL('./src', import.meta.url))
+      '@': fileURLToPath(new URL('./src', import.meta.url)),
+      url: 'rollup-plugin-node-polyfills/polyfills/url'
     }
   },
   build: {

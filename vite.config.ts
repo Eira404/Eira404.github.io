@@ -4,7 +4,6 @@ import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import vueDevTools from 'vite-plugin-vue-devtools'
 import tailwindcss from '@tailwindcss/vite'
-import { nodePolyfills } from 'vite-plugin-node-polyfills'
 
 import { buildMdRES, copy404 } from './vite.config.helper'
 
@@ -32,15 +31,12 @@ export default defineConfig({
     vueDevTools(),
     tailwindcss(),
     copy404(),
-    buildMdRES(),
-    nodePolyfills({
-      protocolImports: true // 兼容 node:xxx 这种导入
-    })
+    buildMdRES()
   ],
   resolve: {
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url)),
-      url: 'rollup-plugin-node-polyfills/polyfills/url'
+      url: 'url/'   // 注意末尾的斜杠
     }
   },
   build: {
@@ -58,5 +54,8 @@ export default defineConfig({
       }
     },
     sourcemap: true
+  },
+  optimizeDeps: {
+    include: ['url'] // 让 Vite 预打包，避免运行时解析差异
   }
 })

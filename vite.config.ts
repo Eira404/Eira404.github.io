@@ -5,7 +5,7 @@ import vue from '@vitejs/plugin-vue'
 import vueDevTools from 'vite-plugin-vue-devtools'
 import tailwindcss from '@tailwindcss/vite'
 
-import { buildMdRES, copy404 } from './vite.config.helper'
+import { buildMdRES, copyFiles } from './vite.config.helper'
 
 // https://vite.dev/config/
 export default defineConfig({
@@ -30,7 +30,7 @@ export default defineConfig({
     vue(),
     vueDevTools(),
     tailwindcss(),
-    copy404(),
+    copyFiles(),
     buildMdRES()
   ],
   resolve: {

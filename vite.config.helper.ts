@@ -253,15 +253,18 @@ function buildRES(isDev: boolean) {
   console.log(`🔄 ${isDev ? 'dev' : 'build'} RES.json (${list.length} items)`)
 }
 
-export function copy404(): PluginOption {
+export function copyFiles(): PluginOption {
   return {
     name: 'vite-plugin-copy-404',
     // 构建结束后再复制
     closeBundle() {
-      const from = resolve('dist/index.html')
-      const to   = resolve('dist/404.html')
-      copyFileSync(from, to)
-      console.log('✅ dist/404.html copied from index.html')
+      const from1 = resolve('dist/index.html')
+      const to1   = resolve('dist/404.html')
+      const from2 = resolve('.nojekyll')
+      const to2 = resolve('dist/.nojekyll')
+      copyFileSync(from1, to1)
+      copyFileSync(from2, to2)
+      console.log('✅ copy files')
     }
   }
 }
@@ -273,7 +276,6 @@ export function buildMdRES(): PluginOption {
     configureServer(server) {
       buildRES(true)
       server.watcher.add(MD_DIR)
-      // server.watcher.add('/data')
       server.watcher.on('all', (_, path) => {
         if (path.endsWith('.md') || path.endsWith('.yml')) buildRES(true)
       })

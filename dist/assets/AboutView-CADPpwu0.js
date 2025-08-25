@@ -1,0 +1,1 @@
+import{_ as t}from"./_plugin-vue_export-helper-DlAUqK2U.js";import{I as e,N as s,J as r}from"./vendor-Cgv2NQ8W.js";import"./katex-S9ZM2IJj.js";import"./typescript-CUSX335q.js";const a={},n={class:"about"};function c(i,o){return r(),e("div",n,o[0]||(o[0]=[s("h1",null,"This is an about page",-1)]))}const l=t(a,[["render",c]]);export{l as default};

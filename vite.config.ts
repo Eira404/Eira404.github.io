@@ -35,8 +35,7 @@ export default defineConfig({
   ],
   resolve: {
     alias: {
-      '@': fileURLToPath(new URL('./src', import.meta.url)),
-      url: 'url/'   // 注意末尾的斜杠
+      '@': fileURLToPath(new URL('./src', import.meta.url))
     }
   },
   build: {
@@ -47,15 +46,9 @@ export default defineConfig({
           if (id.includes('zrender')) return 'zrender'
           if (id.includes('katex')) return 'katex'
           if (id.includes('typescript')) return 'typescript'
-          if (id.includes('@pixi')) return '@pixi'
-          if (id.includes('@codemirror')) return '@codemirror'
           if (id.includes('node_modules')) return 'vendor'
         }
       }
-    },
-    sourcemap: true
-  },
-  optimizeDeps: {
-    include: ['url'] // 让 Vite 预打包，避免运行时解析差异
+    }
   }
 })

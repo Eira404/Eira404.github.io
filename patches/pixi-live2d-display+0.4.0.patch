@@ -1,0 +1,211 @@
+diff --git a/node_modules/pixi-live2d-display/dist/cubism4.es.js b/node_modules/pixi-live2d-display/dist/cubism4.es.js
+index f21619f..010278a 100644
+--- a/node_modules/pixi-live2d-display/dist/cubism4.es.js
++++ b/node_modules/pixi-live2d-display/dist/cubism4.es.js
+@@ -3759,8 +3759,8 @@ class ExpressionManager extends EventEmitter {
+     this.defaultExpression = this.createExpression({}, void 0);
+     this.currentExpression = this.defaultExpression;
+     this.stopAllExpressions();
+-  }
+-  loadExpression(index) {
++  } /** 修改 loadExpression 源代码，使其支持不通过文件导入表情 */
++  loadExpression(index, data) {
+     return __async(this, null, function* () {
+       if (!this.definitions[index]) {
+         logger.warn(this.tag, `Undefined expression at [${index}]`);
+@@ -3773,12 +3773,12 @@ class ExpressionManager extends EventEmitter {
+       if (this.expressions[index]) {
+         return this.expressions[index];
+       }
+-      const expression = yield this._loadExpression(index);
++      const expression = yield this._loadExpression(index, data);
+       this.expressions[index] = expression;
+       return expression;
+     });
+   }
+-  _loadExpression(index) {
++  _loadExpression(index, data) {
+     throw new Error("Not implemented.");
+   }
+   setRandomExpression() {
+@@ -3803,8 +3803,8 @@ class ExpressionManager extends EventEmitter {
+   }
+   restoreExpression() {
+     this._setExpression(this.currentExpression);
+-  }
+-  setExpression(index) {
++  } /** 修改 setExpression 源代码，使其支持不通过文件导入表情 */
++  setExpression(index, data) {
+     return __async(this, null, function* () {
+       if (typeof index !== "number") {
+         index = this.getExpressionIndex(index);
+@@ -3816,7 +3816,7 @@ class ExpressionManager extends EventEmitter {
+         return false;
+       }
+       this.reserveExpressionIndex = index;
+-      const expression = yield this.loadExpression(index);
++      const expression = yield this.loadExpression(index, data);
+       if (!expression || this.reserveExpressionIndex !== index) {
+         return false;
+       }
+@@ -4701,7 +4701,7 @@ const _Live2DFactory = class {
+     }
+     return Promise.resolve(void 0);
+   }
+-  static loadExpression(expressionManager, index) {
++  static loadExpression(expressionManager, index, data) {
+     var _a;
+     const handleError = (e) => expressionManager.emit("expressionLoadError", index, e);
+     try {
+@@ -4717,13 +4717,27 @@ const _Live2DFactory = class {
+         tasks = [];
+         _Live2DFactory.expressionTasksMap.set(expressionManager, tasks);
+       }
+-      const path = expressionManager.getExpressionFile(definition);
+-      (_a = tasks[index]) != null ? _a : tasks[index] = Live2DLoader.load({
+-        url: path,
+-        settings: expressionManager.settings,
+-        type: "json",
+-        target: expressionManager
+-      }).then((data) => {
++      /** 修改源代码 */
++      if(!data) {
++        const path = expressionManager.getExpressionFile(definition);
++        (_a = tasks[index]) != null ? _a : tasks[index] = Live2DLoader.load({
++          url: path,
++          settings: expressionManager.settings,
++          type: "json",
++          target: expressionManager
++        }).then((data) => {
++          const tasks2 = _Live2DFactory.expressionTasksMap.get(expressionManager);
++          if (tasks2) {
++            delete tasks2[index];
++          }
++          const expression = expressionManager.createExpression(data, definition);
++          expressionManager.emit("expressionLoaded", index, expression);
++          return expression;
++        }).catch((e) => {
++          logger.warn(expressionManager.tag, `Failed to load expression: ${path}`, e);
++          handleError(e);
++        });
++      } else {
+         const tasks2 = _Live2DFactory.expressionTasksMap.get(expressionManager);
+         if (tasks2) {
+           delete tasks2[index];
+@@ -4731,11 +4745,7 @@ const _Live2DFactory = class {
+         const expression = expressionManager.createExpression(data, definition);
+         expressionManager.emit("expressionLoaded", index, expression);
+         return expression;
+-      }).catch((e) => {
+-        logger.warn(expressionManager.tag, `Failed to load expression: ${path}
+-`, e);
+-        handleError(e);
+-      });
++      }
+       return tasks[index];
+     } catch (e) {
+       logger.warn(expressionManager.tag, `Failed to load expression at [${index}]
+@@ -4772,9 +4782,9 @@ Live2DFactory.motionTasksMap = /* @__PURE__ */ new WeakMap();
+ Live2DFactory.expressionTasksMap = /* @__PURE__ */ new WeakMap();
+ MotionManager.prototype["_loadMotion"] = function(group, index) {
+   return Live2DFactory.loadMotion(this, group, index);
+-};
+-ExpressionManager.prototype["_loadExpression"] = function(index) {
+-  return Live2DFactory.loadExpression(this, index);
++}; /** 修改 _loadExpression 源代码，使其支持不通过文件导入表情 */
++ExpressionManager.prototype["_loadExpression"] = function(index, data) {
++  return Live2DFactory.loadExpression(this, index, data);
+ };
+ class InteractionMixin {
+   constructor() {
+@@ -4883,10 +4893,10 @@ class Live2DModel extends Container {
+   }
+   motion(group, index, priority) {
+     return index === void 0 ? this.internalModel.motionManager.startRandomMotion(group, priority) : this.internalModel.motionManager.startMotion(group, index, priority);
+-  }
+-  expression(id) {
++  } /** 修改 expression 源代码，使其支持不通过文件导入表情数据 */
++  expression(id, data) {
+     if (this.internalModel.motionManager.expressionManager) {
+-      return id === void 0 ? this.internalModel.motionManager.expressionManager.setRandomExpression() : this.internalModel.motionManager.expressionManager.setExpression(id);
++      return id === void 0 ? this.internalModel.motionManager.expressionManager.setRandomExpression() : this.internalModel.motionManager.expressionManager.setExpression(id, data);
+     }
+     return Promise.resolve(false);
+   }
+diff --git a/node_modules/pixi-live2d-display/dist/cubism4.js b/node_modules/pixi-live2d-display/dist/cubism4.js
+index 03c1fb2..a0a4085 100644
+--- a/node_modules/pixi-live2d-display/dist/cubism4.js
++++ b/node_modules/pixi-live2d-display/dist/cubism4.js
+@@ -3759,8 +3759,8 @@ var __async = (__this, __arguments, generator) => {
+       this.defaultExpression = this.createExpression({}, void 0);
+       this.currentExpression = this.defaultExpression;
+       this.stopAllExpressions();
+-    }
+-    loadExpression(index) {
++    } /** 修改 loadExpression 源代码，使其支持不从文件导入表情 */
++    loadExpression(index, data) {
+       return __async(this, null, function* () {
+         if (!this.definitions[index]) {
+           logger.warn(this.tag, `Undefined expression at [${index}]`);
+@@ -3803,8 +3803,8 @@ var __async = (__this, __arguments, generator) => {
+     }
+     restoreExpression() {
+       this._setExpression(this.currentExpression);
+-    }
+-    setExpression(index) {
++    } /** 修改setExpression源代码，使其支持不从文件导入表情 */
++    setExpression(index, data) {
+       return __async(this, null, function* () {
+         if (typeof index !== "number") {
+           index = this.getExpressionIndex(index);
+@@ -3815,8 +3815,8 @@ var __async = (__this, __arguments, generator) => {
+         if (index === this.expressions.indexOf(this.currentExpression)) {
+           return false;
+         }
+-        this.reserveExpressionIndex = index;
+-        const expression = yield this.loadExpression(index);
++        this.reserveExpressionIndex = index; /** 修改 loadExpression 源代码，使其支持不从文件导入表情 */
++        const expression = yield this.loadExpression(index, data);
+         if (!expression || this.reserveExpressionIndex !== index) {
+           return false;
+         }
+@@ -4883,10 +4883,10 @@ var __async = (__this, __arguments, generator) => {
+     }
+     motion(group, index, priority) {
+       return index === void 0 ? this.internalModel.motionManager.startRandomMotion(group, priority) : this.internalModel.motionManager.startMotion(group, index, priority);
+-    }
+-    expression(id) {
++    } /** 修改expression源代码，使其支持不从文件导入表情 */
++    expression(id, data) {
+       if (this.internalModel.motionManager.expressionManager) {
+-        return id === void 0 ? this.internalModel.motionManager.expressionManager.setRandomExpression() : this.internalModel.motionManager.expressionManager.setExpression(id);
++        return id === void 0 ? this.internalModel.motionManager.expressionManager.setRandomExpression() : this.internalModel.motionManager.expressionManager.setExpression(id, data);
+       }
+       return Promise.resolve(false);
+     }
+@@ -5209,6 +5209,7 @@ var __async = (__this, __arguments, generator) => {
+       return CubismExpressionMotion.create(data);
+     }
+     _setExpression(motion) {
++      console.log('set expression', motion)
+       return this.queueManager.startMotion(motion, false, performance.now());
+     }
+     stopAllExpressions() {
+diff --git a/node_modules/pixi-live2d-display/types/index.d.ts b/node_modules/pixi-live2d-display/types/index.d.ts
+index dff08ce..d3bb342 100644
+--- a/node_modules/pixi-live2d-display/types/index.d.ts
++++ b/node_modules/pixi-live2d-display/types/index.d.ts
+@@ -1605,11 +1605,11 @@ export declare class Live2DModel<IM extends InternalModel = InternalModel> exten
+ 	 */
+ 	motion(group: string, index?: number, priority?: MotionPriority): Promise<boolean>;
+ 	/**
+-	 * Shorthand to set an expression.
++	 * Shorthand to set an expression. 增加, data?: any，使其支持不通过文件导入表情数据
+ 	 * @param id - Either the index, or the name of the expression. If not presented, a random expression will be set.
+ 	 * @return Promise that resolves with true if succeeded, with false otherwise.
+ 	 */
+-	expression(id?: number | string): Promise<boolean>;
++	expression(id?: number | string, data?: any): Promise<boolean>;
+ 	/**
+ 	 * Updates the focus position. This will not cause the model to immediately look at the position,
+ 	 * instead the movement will be interpolated.

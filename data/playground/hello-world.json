@@ -1,0 +1,22 @@
+[
+  {
+    "name": "css.css",
+    "code": "div {\r\n  font-size: larger;\r\n}",
+    "type": "css"
+  },
+  {
+    "name": "html.html",
+    "code": "<div>\r\n  Hello world\r\n</div>",
+    "type": "html"
+  },
+  {
+    "name": "js.js",
+    "code": "console.log('hello world')\r\n",
+    "type": "js"
+  },
+  {
+    "name": "ts.ts",
+    "code": "console.log('hello world')\r\n",
+    "type": "ts"
+  }
+]

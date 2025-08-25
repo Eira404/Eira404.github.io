@@ -5,7 +5,8 @@ export type SelectorMutationObserverConfig = {
   subtree: boolean
 }
 export type SelectorListOptions = {
-  childrenEvent: boolean
+  childrenEvent?: boolean
+  rewrite?: boolean
 }
 
 /**
@@ -30,261 +31,211 @@ export type SelectorEvent = {
   e: any
 }
 const defaultSelectorListOptions: SelectorListOptions = {
-  childrenEvent: false
+  childrenEvent: false,
+  rewrite: false
 }
 
-class SelectorItem extends EventEmitter {
-  selector: Selector
-  element: Element
-  select: string
-  event: string
-  trigger: string
-  option: SelectorListOptions
-  onEvent_: (e: any) => void
-  constructor(
-    selector: Selector,
-    element: Element,
-    select: string,
-    event: string,
-    trigger: string,
-    option?: SelectorListOptions
-  ) {
-    super()
-    /**
-     * 选择器实例
-     */
-    this.selector = selector
+export class SelectorItem {
+  private readonly __selector: Selector
+  private readonly __element: Element
+  private readonly __eventMap: Map<{ select: string, event: string, trigger: string }, (e: any) => void> = new Map()
+  private readonly __optionsMap: Map<{ select: string, event: string, trigger: string }, SelectorListOptions> = new Map()
 
-    /**
-     * 选定的标签
-     */
-    this.element = element
-
-    /**
-     * 选定该标签使用的querySelectorAll语句
-     */
-    this.select = select
-
-    /**
-     * 需要绑定的事件
-     */
-    this.event = event
-
-    /**
-     * 事件触发后，回调需要触发的事件
-     */
-    this.trigger = trigger
-
-    /**
-     * 配置项
-     * ```js
-     * const option = {
-     *   childrenEvent: false, // 如果事件从子元素冒泡，是否接收(false：不接收)
-     * }
-     * ```
-     */
-    this.option = option || defaultSelectorListOptions
-
-    this.onEvent_ = this.onEvent.bind(this)
-    this.element.addEventListener(this.event, this.onEvent_)
+  get element() {
+    return this.__element
   }
 
-  onEvent(e: any) {
-    if (e.target !== this.element && !this.option.childrenEvent) return
-    e.preventDefault()
-    this.selector.onEvent(this.element, this.event, this.select, e, this.trigger)
+  get size() {
+    return this.__eventMap.size
+  }
+
+  constructor(selector: Selector, element: Element) {
+    this.__selector = selector
+    this.__element = element
+  }
+
+  private getKey(select: string, event: string, trigger: string) {
+    return { select, event, trigger }
+  }
+
+  private createEventCallback(select: string, event: string, trigger: string, option: SelectorListOptions) {
+    const callback = (e: any) => {
+      if (e.target !== this.__element && !option.childrenEvent) return
+      e.preventDefault()
+      this.__selector.onEvent(this.__element, event, select, e, trigger)
+    }
+    return callback
+  }
+
+  addEvent(select: string, event: string, trigger: string, option?: SelectorListOptions) {
+    option = { ...defaultSelectorListOptions, ...option }
+    const key = this.getKey(select, event, trigger)
+    if (this.__eventMap.has(key) && !option.rewrite) return
+    const callback = this.createEventCallback(select, event, trigger, option)
+    this.__element.addEventListener(event, callback)
+    if (this.__eventMap.has(key)) {
+      this.__element.removeEventListener(event, this.__eventMap.get(key)!)
+    }
+    this.__eventMap.set(key, callback)
+    this.__optionsMap.set(key, option)
+  }
+
+  removeEvent(select: string, event: string, trigger: string) {
+    const key = this.getKey(select, event, trigger)
+    const e = this.__eventMap.get(key)
+    if (e) this.__element.removeEventListener(event, e)
+  }
+
+  copySelectorItem(element: Element) {
+    const selectorItem = new SelectorItem(this.__selector, element)
+    Array.from(this.__eventMap.keys()).forEach(k => {
+      const options = this.__optionsMap.get(k)
+      if (!options) return
+      selectorItem.addEvent(k.select, k.event, k.trigger, options)
+    })
+    return selectorItem
   }
 
   destroy() {
-    this.element.removeEventListener(this.event, this.onEvent_)
+    Array.from(this.__eventMap.entries()).forEach(([k, e]) => {
+      try {
+        this.__element.removeEventListener(k.event, e)
+      } catch (e) {
+        console.warn(e)
+      }
+    })
+    this.__eventMap.clear()
+    this.__optionsMap.clear()
   }
 }
 
-export default class Selector extends EventEmitter {
-  selectList: SelectorList
-  root: Element
+/**
+ * 标识符由 select + event + trigger 组成
+ */
+export class Selector extends EventEmitter<Record<string, [{ element: Element, event: string, select: string, e: any }]>> {
+  private __selector2Options: Map<{ select: string, event: string, trigger: string }, SelectorListOptions> = new Map()
+  private __selector2Elements: Map<{ select: string, event: string, trigger: string }, Set<Element>> = new Map()
+  private __element2SelectorItem: Map<Element, SelectorItem> = new Map()
 
-  /**
-   * 校验
-   * 防止reselect事件回调触发
-   */
-  destroyed: boolean = false
-  map: Map<Element, Array<SelectorItem>>
-  observer: MutationObserver
-  config: SelectorMutationObserverConfig
+  private __destroyed: boolean = false
 
-  constructor(selectList: SelectorList, root?: Element, config?: SelectorMutationObserverConfig) {
+  private readonly __root: Element
+  private readonly __observer: MutationObserver
+  private readonly __config: SelectorMutationObserverConfig
+
+  constructor(selectList?: SelectorList, root?: Element, config?: SelectorMutationObserverConfig) {
     super()
     const MutationObserver =
-      window.MutationObserver ||
-      (window as any).WebKitMutationObserver ||
-      (window as any).MozMutationObserver
+        window.MutationObserver ||
+        (window as any).WebKitMutationObserver ||
+        (window as any).MozMutationObserver
 
-    /**
-     * 选择列表
-     * ```js
-     * const selectList = [
-     *   // event, querySelectorAll(...), trigger event name, opt
-     *   ['click', '#app', 'clickApp'],
-     *   ['mouseenter', 'a', 'enterA', { childrenEvent: false }]
-     * ]
-     * ```
-     */
-    this.selectList = selectList || []
+    this.__root = root || document.body
 
-    /**
-     * 监视变化的根元素
-     */
-    this.root = root || document.body
+    this.__observer = new MutationObserver((mutationsList, observer) => {
+      this.refresh()
+    })
 
-    /**
-     * 标签与SelectorItem图
+    this.__config = { childList: true, subtree: true, ...config }
+
+    this.__observer.observe(this.__root, this.__config)
+
+    this.addSelectorList(selectList || [])
+
+    this.refresh()
+  }
+
+  /**
+     * SelectorItem实例触发后的回调函数
      *
-     * - key: element
-     * - value: [selectorItem1, selectorItem2, ...]
+     * @param {HTMLElement} element html元素
+     * @param {String} event 事件触发名字
+     * @param {String} select querySelectorAll对应的选择方法
+     * @param {Object} e 事件获取的事件对象
+     * @param {String} trigger 触发器名字
      */
-    this.map = new Map()
-
-    /**
-     * MutationObserver观察者
-     */
-    this.observer = new MutationObserver((mutationsList, observer) => {
-      this.reselect(false)
-    })
-
-    /**
-     * MutationObserver观察配置项
-     */
-    this.config = config || { childList: true, subtree: true }
-
-    /**
-     * 开始观察
-     */
-    this.observer.observe(this.root, this.config)
-
-    /**
-     * 初始化标签选择
-     */
-    this.select()
-  }
-
-  /**
-   * 更新选择列表，并重新选择
-   * @param {Array} selectList 选择列表
-   */
-  updateSelectList(selectList: SelectorList) {
-    this.selectList = selectList
-    this.reselect(true)
-  }
-
-  /**
-   * 销毁选择器实例
-   */
-  destroy() {
-    if (this.destroyed) return
-    this.destroyed = true
-    const selectorItemLists = Array.from(this.map.values())
-    selectorItemLists.forEach((selectorItemList) => {
-      selectorItemList.forEach((selectorItem) => {
-        selectorItem.destroy()
-      })
-    })
-    this.observer.disconnect()
-    this.map.clear()
-    this.removeAllListeners()
-  }
-
-  /**
-   * 选择标签
-   */
-  select() {
-    setTimeout(() => {
-      if (this.destroyed) return
-      this.selectList.forEach((item) => {
-        const event = item[0]
-        const select = item[1]
-        const trigger = item[2]
-        const options = item[3]
-        const elements = Array.from(document.querySelectorAll(select))
-        elements.forEach((element) => {
-          const selectorItem = new SelectorItem(this, element, select, event, trigger, options)
-          if (!this.map.has(element)) this.map.set(element, [])
-          this.map.get(element)?.push(selectorItem)
-        })
-      })
-    }, 0)
-  }
-
-  /**
-   * 重新选择
-   */
-  reselect(force = false) {
-    setTimeout(() => {
-      if (this.destroyed) {
-        return
-      }
-      if (force === true) {
-        const selectorItemLists = Array.from(this.map.values())
-        selectorItemLists.forEach((selectorItemList) => {
-          selectorItemList.forEach((selectorItem) => {
-            selectorItem.destroy()
-          })
-        })
-        this.map.clear()
-      }
-      const tempMap = new Map()
-      const visitedElements = new Set()
-      this.selectList.forEach((item) => {
-        const event = item[0]
-        const select = item[1]
-        const trigger = item[2]
-        const options = item[3]
-        const elements = Array.from(document.querySelectorAll(select))
-        elements.forEach((element) => {
-          // 文档中存在该元素
-          //
-          visitedElements.add(element)
-          // 如果map中存在该元素 直接忽略
-          // 这样会导致reselect过程不能增加event
-          // 新增事件 需要force为true
-          //
-          if (this.map.has(element)) return
-          const selectorItem = new SelectorItem(this, element, select, event, trigger, options)
-          if (!tempMap.has(element)) tempMap.set(element, [])
-          tempMap.get(element).push(selectorItem)
-        })
-      })
-      // 由于tempMap和map键不会有冲突
-      // 直接合并
-      //
-      this.map = new Map([...this.map, ...tempMap])
-      const elements = Array.from(this.map.keys())
-      elements.forEach((element) => {
-        if (!document.contains(element) || !visitedElements.has(element)) {
-          // dom中不存在的
-          // 元素没有被遍历过的（dom中存在，但是没有被select）（但是好像不会出现这个情况，触发直接改selectList然后reselect(false)）
-          //
-          const selectorItemList = this.map.get(element) || []
-          selectorItemList.forEach((selectorItem) => {
-            selectorItem.destroy()
-          })
-          this.map.delete(element)
-        }
-      })
-    }, 0)
-  }
-
-  /**
-   * SelectorItem实例触发后的回调函数
-   *
-   * @param {HTMLElement} element html元素
-   * @param {String} event 事件触发名字
-   * @param {String} select querySelectorAll对应的选择方法
-   * @param {Object} e 事件获取的事件对象
-   * @param {String} trigger 触发器名字
-   */
   onEvent(element: Element, event: string, select: string, e: any, trigger: string) {
     const data: SelectorEvent = { element, event, select, e }
     this.emit(trigger, data)
+  }
+
+  private getKey(select: string, event: string, trigger: string) {
+    return { select, event, trigger }
+  }
+
+  addSelectorList(selectList: SelectorList) {
+    selectList.forEach(item => {
+      const [event, select, trigger, options_] = item
+      const options = { ...defaultSelectorListOptions, ...options_ }
+      const key = this.getKey(select, event, trigger)
+      if (this.__selector2Options.has(key) && !options.rewrite) return
+      this.__selector2Options.set(key, options)
+    })
+    this.refresh()
+  }
+
+  removeSelectorList(selectList: SelectorList) {
+    selectList.forEach(item => {
+      const [event, select, trigger] = item
+      const key = this.getKey(select, event, trigger)
+      const elements = this.__selector2Elements.get(key)
+      if (!elements) return
+      new Set(elements).forEach(element => {
+        const si = this.__element2SelectorItem.get(element)
+        si?.removeEvent(select, event, trigger)
+        if (si?.size === 0) {
+          elements.delete(element)
+          si.destroy()
+          this.__element2SelectorItem.delete(element)
+        }
+      })
+      this.__selector2Elements.delete(key)
+      this.__selector2Options.delete(key)
+    })
+    this.refresh()
+  }
+
+  private select() {
+    setTimeout(() => {
+      const kvList = Array.from(this.__selector2Options.entries())
+      kvList.forEach(([selector, options]) => {
+        const displayElements = Array.from(document.querySelectorAll(selector.select))
+        const selectedElements = new Set(this.__selector2Elements.get(selector)) || new Set()
+        displayElements.forEach(dElement => {
+          if (selectedElements.has(dElement)) {
+            if (options.rewrite) {
+              this.__element2SelectorItem.get(dElement)?.addEvent(selector.select, selector.event, selector.trigger, options)
+            }
+            selectedElements.delete(dElement)
+            return
+          }
+          const selectorItem = new SelectorItem(this, dElement)
+          selectorItem.addEvent(selector.select, selector.event, selector.trigger, options)
+          this.__element2SelectorItem.set(dElement, selectorItem)
+        })
+        selectedElements.forEach(sElement => {
+          this.__element2SelectorItem.get(sElement)?.destroy()
+          this.__element2SelectorItem.delete(sElement)
+        })
+        this.__selector2Elements.set(selector, new Set(displayElements))
+      })
+    }, 0)
+  }
+
+  private refresh() {
+    this.select()
+  }
+
+  destroy() {
+    if (this.__destroyed) return
+    this.__destroyed = true
+    Array.from(this.__element2SelectorItem.values()).forEach(selectorItem => {
+      selectorItem.destroy()
+    })
+    this.__observer.disconnect()
+    this.__element2SelectorItem.clear()
+    this.__selector2Options.clear()
+    this.__selector2Elements.clear()
+    this.removeAllListeners()
   }
 }

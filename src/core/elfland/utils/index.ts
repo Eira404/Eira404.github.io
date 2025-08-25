@@ -3,6 +3,7 @@ import { ElMessage } from 'element-plus'
 export * from './stroage'
 export * from './lru'
 export * from './selector'
+export * from './timer'
 
 /**
  * 显示提示框
@@ -253,5 +254,84 @@ export function generateRandomStringBase(characters_?: string) {
     idMap.set(result, true)
 
     return result
+  }
+}
+
+/**
+ * 判断是否是Object
+ * @param value 待判定对象
+ * @returns 是否是Object
+ */
+export function isObject(value: any) {
+  return (
+    typeof value === 'object' &&
+    value !== null &&
+    Object.prototype.toString.call(value) === '[object Object]'
+  )
+}
+
+/**
+ * 概率函数
+ * @param a 分子
+ * @param b 分母
+ * @returns 在概率(a/b)下，本次运行是否触发
+ */
+export function probability(a: number, b: number): boolean {
+  if (a <= 0 || b <= 0) {
+    throw new Error('输入的a和b必须大于0')
+  }
+  const random = Math.random()
+  return random < a / b
+}
+
+/**
+ * 判断是否在时间区间内部
+ * @param timePeriods 时间区间数据
+ * @returns 是否在时间区间内部
+ */
+export function isInTimeInterval(timePeriods: Array<[number, number]>): boolean {
+  // 获取当前时间
+  const now = new Date()
+  const hours = now.getHours()
+  const minutes = now.getMinutes()
+
+  // 将当前时间转换为分钟
+  const currentMinutes = hours * 60 + minutes
+
+  // 遍历时间区间列表
+  for (const [start, end] of timePeriods) {
+    // 将时间区间的开始和结束时间转换为分钟
+    const startMinutes = start * 60
+    const endMinutes = end === 24 ? 24 * 60 : end * 60 // 如果结束时间是24，转换为1440
+
+    // 检查当前时间是否在时间区间内
+    // 如果当前时间大于等于开始时间，并且小于结束时间
+    if (currentMinutes >= startMinutes && currentMinutes < endMinutes) {
+      return true
+    }
+  }
+
+  // 如果当前时间不在任何时间区间内，返回false
+  return false
+}
+
+/**
+ * 创建一个连点校验函数
+ * @param time 点击最大间隔时间
+ * @param amount 点击次数
+ * @returns 触发函数
+ */
+export function createQuickClickJudge(time = 400, amount = 5) {
+  let now = 0
+  let timer: NodeJS.Timeout | null = null
+  return function <T extends (...args: any[]) => void>(func: T) {
+    if (timer) clearTimeout(timer)
+    timer = setTimeout(() => {
+      now = 0
+    }, time)
+    now++
+    if (now >= amount) {
+      func()
+    }
   }
 }

@@ -37,5 +37,5 @@ export class Theme extends ElflandAddon {
     this.theme.value = this.theme.value === 'light' ? 'dark' : 'light'
   }
 
-  logoutCallback(): void {}
+  loadedCallback(): void {}
 }

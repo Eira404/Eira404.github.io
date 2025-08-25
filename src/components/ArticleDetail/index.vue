@@ -23,7 +23,7 @@ const activeName = ref('in')
       <div class="flex w-full items-center justify-center">
         <router-link
           class="flex cursor-pointer items-center justify-center p-3 hover:text-moonlight-500 transition-all duration-150 ease-in-out"
-          :to="{ name: 'links'}"
+          :to="{ name: 'diagram'}"
           title="文章关系图谱"
         >
           <el-icon :size="24"><Connection /></el-icon>

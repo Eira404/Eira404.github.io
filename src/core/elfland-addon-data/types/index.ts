@@ -1,3 +1,4 @@
+import type { ElflandLangs } from '@/core/elfland/types'
 import { type AboutData } from './about'
 
 export interface DocDataItem {
@@ -24,16 +25,27 @@ export interface ProjectDataItem {
   description: string
   notes?: string
   url?: string
+  docs?: string
+  'blog-docs'?: string
+  blog?: string
   github?: string
   video?: string
   arxiv?: string
   pinned?: boolean
 }
 
-export interface FriendDataItem {}
+export interface FriendDataItem {
+  name: string
+  url: string
+  avater: string
+  desc: string
+}
 
 export interface DataResJson {
   docs: DocDataItem[]
-  projects: ProjectDataItem[]
-  about: AboutData
+  friends: FriendDataItem[]
+  projects: Record<ElflandLangs, ProjectDataItem[]>
+  about: Record<ElflandLangs, AboutData>
+  tsJsonList: string[]
+  playgroundJsonList: string[]
 }

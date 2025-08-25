@@ -12,6 +12,9 @@ export class Project {
   readonly github?: string
   readonly video?: string
   readonly arxiv?: string
+  readonly docs?: string
+  readonly blog?: string
+  readonly blogDocs?: string
 
   constructor(data: ProjectDataItem) {
     this.name = data.name
@@ -25,6 +28,9 @@ export class Project {
     this.github = data.github
     this.video = data.video
     this.arxiv = data.arxiv
+    this.docs = data.docs
+    this.blog = data.blog
+    this.blogDocs = data['blog-docs']
   }
 }
 

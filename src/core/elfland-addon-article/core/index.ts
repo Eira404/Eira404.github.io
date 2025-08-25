@@ -9,7 +9,6 @@ import type { RouteLocationNormalized, RouteLocationRaw } from 'vue-router'
 import { MdRenderer } from './renderer'
 import type { ResTocItem } from '../types'
 import Clipboard from 'clipboard'
-import Selector from '@/core/elfland/utils/selector'
 
 export class Article extends ElflandAddon {
   private __path: Ref<string> = ref('')
@@ -17,7 +16,6 @@ export class Article extends ElflandAddon {
   private __mdRenderer = new MdRenderer(this)
   private __mdTocString: Ref<string> = ref('')
   private __clipboard: Clipboard
-  private __selector: Selector
 
   get article() {
     return computed(() => {
@@ -76,8 +74,6 @@ export class Article extends ElflandAddon {
   constructor(elfland: Elfland) {
     super(elfland)
 
-    elfland.routerPromise.addCheck(this.check, this)
-    elfland.routerPromise.addPostcheck(this.postcheck, this)
     this.__clipboard = new Clipboard('.md-copy-btn')
     this.__clipboard.on('success', (e) => {
       message('复制成功', 'success')
@@ -85,13 +81,20 @@ export class Article extends ElflandAddon {
     this.__clipboard.on('error', (e) => {
       message('复制失败')
     })
-    this.__selector = new Selector([
+  }
+
+  loadedCallback(): void {
+    this.__elfland.routerPromise.addCheck(this.check, this)
+    this.__elfland.routerPromise.addPostcheck(this.postcheck, this)
+    this.__elfland.selector.addSelectorList([
       ['click', '.markdown-body span[md="codeScroll"]', 'clickCodeScroll', { childrenEvent: true }],
       ['touchstart', '.markdown-body span[md="codeScroll"]', 'clickCodeScroll', { childrenEvent: true }],
       ['click', '.markdown-body span[md="obsidian-link"]', 'clickObsidianLink', { childrenEvent: true }],
-      ['touchstart', '.markdown-body span[md="obsidian-link"]', 'clickObsidianLink', { childrenEvent: true }]
+      ['touchstart', '.markdown-body span[md="obsidian-link"]', 'clickObsidianLink', { childrenEvent: true }],
+      ['click', '.markdown-body span[md="playground"]', 'clickPlayground', { childrenEvent: true }],
+      ['touchstart', '.markdown-body span[md="playground"]', 'clickPlayground', { childrenEvent: true }]
     ])
-    this.__selector.on('clickCodeScroll', (e) => {
+    this.__elfland.selector.on('clickCodeScroll', (e) => {
       const codeScroll = localGet(MdRenderer.CODE_SCROLL_KEY, false) === 'true'
       localSet(MdRenderer.CODE_SCROLL_KEY, !codeScroll)
       const eles = document.querySelectorAll('.markdown-body span[md="codeScroll"]')
@@ -100,16 +103,28 @@ export class Article extends ElflandAddon {
         else eles[i].setAttribute('checked', '')
       }
     })
-    this.__selector.on('clickObsidianLink', (e) => {
+    this.__elfland.selector.on('clickObsidianLink', (e) => {
       const ele = e.element
       const path = ele.getAttribute('path')
       if (path === '') return
+      if (typeof path !== 'string') return
       window.scrollTo(0, 0)
       this.__elfland.routerPromise.router.push(path)
     })
+    this.__elfland.selector.on('clickPlayground', (e) => {
+      const ele = e.element
+      const code = ele.getAttribute('data-example-code')
+      const id = ele.getAttribute('data-example-id')
+      switch (code) {
+        case 'html':
+          this.__elfland.routerPromise.router.push({ name: 'playground', query: { example: id }})
+          break
+        case 'ts':
+          this.__elfland.routerPromise.router.push({ name: 'ts-playground', query: { example: id }})
+          break
+      }
+    })
   }
-
-  logoutCallback(): void {}
 
   getPathByTitle(title: string) {
     const art = this.__elfland.articles.getIdAndPath(title)

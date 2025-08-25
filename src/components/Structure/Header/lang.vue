@@ -1,12 +1,12 @@
-<!-- <script setup lang="ts">
-import { Madison } from '@/core/madison'
+<script setup lang="ts">
 import LangIcon from './langIcon.vue'
+import { useElfland } from '@/core/elfland'
 
-const madison = Madison.getInstance()
-const lang = madison.i18n.getLang()
+const elfland = useElfland()
+const lang = elfland.i18n.getLang()
 
 function change() {
-  madison.i18n.toggleLang()
+  elfland.i18n.toggleLang()
 }
 </script>
 
@@ -26,4 +26,4 @@ function change() {
 .platform-header-lang-icon--en-us {
   transform: scaleX(-1);
 }
-</style> -->
+</style>

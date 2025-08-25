@@ -1,6 +1,8 @@
 - name: Alice
   url: https://alice.dev
   avatar: https://alice.dev/avatar.png
+  desc: Alice's blog
 - name: Bob
   url: https://bob.com
   avatar: https://bob.com/avatar.png
+  desc: Bob's blog

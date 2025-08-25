@@ -77,6 +77,23 @@ const props = defineProps({
         type="arxiv"
         :path="project.arxiv"
       />
+      <icon
+        v-if="project.docs"
+        type="docs"
+        :path="project.docs"
+      />
+      <icon
+        v-if="project.blogDocs"
+        type="blog-docs"
+        :in-blog="true"
+        :to="{ name: 'article', params: { articlePath: project.blogDocs}}"
+      />
+      <icon
+        v-if="project.blog"
+        type="blog"
+        :in-blog="true"
+        :to="{ name: 'article', params: { articlePath: project.blog}}"
+      />
     </div>
   </div>
 </template>

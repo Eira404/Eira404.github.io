@@ -21,3 +21,17 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
+
+.cm-focused {
+  outline: none !important;
+}
+.cm-container > * {
+  width: auto;
+}
+.cm-editor {
+  overflow: visible;
+}
+.cm-container span ,
+.cm-container * {
+  font-family: 'Consolas' !important;
+}

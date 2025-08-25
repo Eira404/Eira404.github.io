@@ -10,13 +10,25 @@
   github: github仓库地址
   video: 演示视频地址
   arxiv: arxiv地址
+  docs: 文档地址
+  blog-docs: 博客文档地址
+  blog: 博客地址
   pinned: true
-- name: AIOps Arena （前端）（Developing）
+
+- name: AIOps Arena （前端）（开发中）
   category: 研究项目
   description: 为南开大学软件学院<a class="a-link" href="https://nkcs.iops.ai/" target="_blank">AIOps实验室</a>的微服务系统管理；数据获取、可视化；故障、数据集、模型、算法管理；算法排名网站，进行Vue3+TS重构。
   url: https://microservo.aiops.cn/
   github: https://github.com/Eira404/AIOpsArena-frontend
   pinned: true
+
+- name: markdown-it-template
+  category: 研究项目
+  description: 为Markdown编写的的模板插件，可以自定义插件实现的具体功能。
+  blog-docs: markdown-it-template
+  blog: markdown-it-template-analyse
+  pinned: true
+
 - name: Arcaea Web版
   category: 研究项目
   contributors: [https://github.com/Eira404, https://github.com/nkuAlexLee, https://github.com/ShmilyYuQAQ]
@@ -26,6 +38,7 @@
   github: https://github.com/Eira404/QVJDQUVB
   video: https://www.bilibili.com/video/BV16N41117xb
   pinned: true
+
 - name: SakuraRenderer 前端文本渲染器
   category: 研究项目
   contributors: [https://github.com/Eira404, https://github.com/nkuAlexLee, https://github.com/mianmaner, https://github.com/ShmilyYuQAQ]
@@ -33,4 +46,3 @@
   description: 这是一款基于 vue3 开发的简易前端文本渲染器，由用户提供文章，前端进行渲染。语法类似于Markdown，在编写文章方面基本上不需要html代码。支持多种模板语法，为用户提供一个简单美观的文本渲染器。
   notes: 软件工程课程设计，做来感受软件工程的学习以及尝试使用编译原理的知识解析文章（最后还是放弃了QAQ，写完之后看markdown-it的源代码才发现我想的太复杂了）。之后转战写markdown-it插件了（好玩爱玩）。
   github: https://github.com/Eira404/SakuraRendererVue
-  pinned: true

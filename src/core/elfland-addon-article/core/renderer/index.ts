@@ -87,6 +87,8 @@ export class MdRenderer {
     '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" ><path fill="currentColor" d="M128 320v576h576V320zm-32-64h640a32 32 0 0 1 32 32v640a32 32 0 0 1-32 32H96a32 32 0 0 1-32-32V288a32 32 0 0 1 32-32M960 96v704a32 32 0 0 1-32 32h-96v-64h64V128H384v64h-64V96a32 32 0 0 1 32-32h576a32 32 0 0 1 32 32M256 672h320v64H256zm0-192h320v64H256z"></path></svg>'
   private svgCodeScroll =
     '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" ><path fill="currentColor" d="M511.552 128c-35.584 0-64.384 28.8-64.384 64.448v516.48L274.048 570.88a94.272 94.272 0 0 0-112.896-3.456 44.416 44.416 0 0 0-8.96 62.208L332.8 870.4A64 64 0 0 0 384 896h512V575.232a64 64 0 0 0-45.632-61.312l-205.952-61.76A96 96 0 0 1 576 360.192V192.448C576 156.8 547.2 128 511.552 128M359.04 556.8l24.128 19.2V192.448a128.448 128.448 0 1 1 256.832 0v167.744a32 32 0 0 0 22.784 30.656l206.016 61.76A128 128 0 0 1 960 575.232V896a64 64 0 0 1-64 64H384a128 128 0 0 1-102.4-51.2L101.056 668.032A108.416 108.416 0 0 1 128 512.512a158.272 158.272 0 0 1 185.984 8.32z"></path></svg>'
+  private svgPlayground =
+    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" ><path fill="currentColor" d="M32 128h960v64H32z"></path><path fill="currentColor" d="M192 192v512h640V192zm-64-64h768v608a32 32 0 0 1-32 32H160a32 32 0 0 1-32-32z"></path><path fill="currentColor" d="M322.176 960H248.32l144.64-250.56 55.424 32zm453.888 0h-73.856L576 741.44l55.424-32z"></path></svg>'
 
   constructor(article: Article) {
     this.article = article
@@ -96,13 +98,18 @@ export class MdRenderer {
       highlight: (str, lang) => {
         lang = lang.trim()
         const spaceI = lang.indexOf(':')
-        const detail = spaceI === -1 ? '' : lang.slice(spaceI + 1)
+        const allDetail = spaceI === -1 ? '' : lang.slice(spaceI + 1)
+        const delailList = allDetail.split(',').map(d => d.trim()).filter((detail) => detail !== '')
+        const fileName = delailList[0] === undefined || delailList[0] === 'null' ? '' : delailList[0]
+        const exampleCode = delailList[1]
+        const exampleId = delailList[2] || ''
         lang = spaceI === -1 ? lang : lang.slice(0, spaceI)
         const codeIndex = this.generateRandomString()
         const button = `<span class="md-code-btn md-copy-btn select-none" title="点击复制" type="button" data-clipboard-action="copy" data-clipboard-target="#copy${codeIndex}">${this.svg}</span>`
         const codeScroll = `<span class="md-code-btn select-none" md="codeScroll" title="调整代码块最大高度" ${this.codeScroll ? 'checked' : ''}>${this.svgCodeScroll}</span>`
+        const playgroundButton = `<span class="md-code-btn select-none" md="playground" title="在 Playground 中编辑" data-example-code="${exampleCode}" data-example-id="${exampleId}" >${this.svgPlayground}</span>`
         const showLang = '<span>' + this.getLang(lang) + '</span>'
-        const showDetail = `<span>${detail}</span>`
+        const showDetail = `<span>${fileName}</span>`
         const code = this.md.utils.escapeHtml(str)
         let codeHtml = code
         if (lang && hljs.getLanguage(lang)) {
@@ -114,7 +121,7 @@ export class MdRenderer {
         }
 
         const headLeft = `<div>${showLang}${showDetail}</div>`
-        const headRight = `<div>${codeScroll}${button}</div>`
+        const headRight = `<div>${exampleId === '' ? '' : playgroundButton}${codeScroll}${button}</div>`
 
         const codeLable = `<pre class="hljs">${codeHtml}<code></code></pre>`
         const headLabel = `<div>${headLeft}${headRight}</div>`

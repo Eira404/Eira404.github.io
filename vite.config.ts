@@ -39,6 +39,9 @@ export default defineConfig({
           if (id.includes('echarts')) return 'echarts'
           if (id.includes('zrender')) return 'zrender'
           if (id.includes('katex')) return 'katex'
+          if (id.includes('typescript')) return 'typescript'
+          if (id.includes('@pixi')) return '@pixi'
+          if (id.includes('@codemirror')) return '@codemirror'
           if (id.includes('node_modules')) return 'vendor'
         }
       }

@@ -8,6 +8,10 @@ declare module '*.vue' {
   export default vueComponent
 }
 
+declare interface Window {
+  PIXI: any
+}
+
 declare module 'nprogress'
 declare module 'markdown-it-container'
 declare module 'markdown-it-emoji'
@@ -18,3 +22,4 @@ declare module 'markdown-it-sub'
 declare module 'markdown-it-sup'
 declare module '@mdit/plugin-plantuml'
 declare module 'highlightjs-vue'
+declare module 'js-beautify'

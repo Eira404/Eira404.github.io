@@ -7,10 +7,10 @@ export abstract class ElflandAddon {
   constructor(elfland: Elfland) {
     this.__elfland = elfland
 
-    elfland.on('logout', this.logoutCallback, this)
+    elfland.on('loaded', this.loadedCallback, this)
   }
 
-  abstract logoutCallback(): void
+  abstract loadedCallback(): void
 
   /**
    * 去往的页面的name是否是输入的name

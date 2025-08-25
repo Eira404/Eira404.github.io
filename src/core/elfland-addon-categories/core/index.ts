@@ -36,12 +36,12 @@ export class Categories extends ElflandAddon {
 
   constructor(elfland: Elfland) {
     super(elfland)
-
-    elfland.routerPromise.addCheck(this.check, this)
-    elfland.routerPromise.addPostcheck(this.postcheck, this)
   }
 
-  logoutCallback(): void {}
+  loadedCallback(): void {
+    this.__elfland.routerPromise.addCheck(this.check, this)
+    this.__elfland.routerPromise.addPostcheck(this.postcheck, this)
+  }
 
   private async check(
     to: RouteLocationNormalized,

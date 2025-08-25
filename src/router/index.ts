@@ -31,8 +31,8 @@ const router = createRouter({
       component: () => import('../views/Tags/index.vue')
     },
     {
-      path: '/links',
-      name: 'links',
+      path: '/diagram',
+      name: 'diagram',
       component: () => import('../views/Links/index.vue')
     },
     {
@@ -49,6 +49,16 @@ const router = createRouter({
       path: '/about',
       name: 'about',
       component: () => import('../views/AboutView.vue')
+    },
+    {
+      path: '/playground',
+      name: 'playground',
+      component: () => import('../views/Playground/index.vue')
+    },
+    {
+      path: '/ts-playground',
+      name: 'ts-playground',
+      component: () => import('../views/TSPlayground/index.vue')
     },
     {
       path: '/:pathMatch(.*)*',

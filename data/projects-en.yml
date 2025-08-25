@@ -1,0 +1,48 @@
+- Sorted: [Publications, Research Projects, Personal Projects, Others]
+- name: Example
+  category: 出版物
+  author: 作者
+  contributors: [贡献者]
+  role: 角色
+  description: 描述
+  notes: 备注
+  url: 演示网页地址
+  github: github仓库地址
+  video: 演示视频地址
+  arxiv: arxiv地址
+  docs: 文档地址
+  blog-docs: 博客文档地址
+  blog: 博客地址
+  pinned: true
+
+- name: AIOps Arena (Frontend) (In Development)
+  category: Research Project
+  description: Microservice system management for the <a class="a-link" href="https://nkcs.iops.ai/" target="_blank">AIOps Laboratory</a> of the School of Software, Nankai University; data acquisition and visualization; fault, dataset, model, and algorithm management; algorithm ranking site, currently being refactored with Vue3 + TS.
+  url: https://microservo.aiops.cn/
+  github: https://github.com/Eira404/AIOpsArena-frontend
+  pinned: true
+
+- name: markdown-it-template
+  category: 研究项目
+  description: 为Markdown编写的的模板插件，可以自定义插件实现的具体功能。
+  blog-docs: markdown-it-template
+  blog: markdown-it-template-analyse
+  pinned: true
+
+- name: Arcaea Web Edition
+  category: Research Project
+  contributors: [https://github.com/Eira404, https://github.com/nkuAlexLee, https://github.com/ShmilyYuQAQ]
+  role: Project Lead
+  description: This project implements a rhythm game on the web. It was developed as part of the 2023 Frontend Development Training Course Design at Nankai University. It is solely for self-learning and will not be commercialized. Features of this version include registration, login, adding friends, partner selection, music pack selection, song selection, automated machine play, potential value calculation, fragment calculation, etc. Player gameplay is not currently supported. The logic judgment code has been completed but not yet integrated into this version.
+  notes: The audio, images, fonts, and designs used in this project are unpacked from the Arcaea game. I do not own any of these assets. All copyrights for the audio, images, and fonts belong to lowiro or other companies. Only the code is self-written. If this project infringes on your rights, please contact me for removal.
+  github: https://github.com/Eira404/QVJDQUVB
+  video: https://www.bilibili.com/video/BV16N41117xb
+  pinned: true
+
+- name: SakuraRenderer Frontend Text Renderer
+  category: Research Project
+  contributors: [https://github.com/Eira404, https://github.com/nkuAlexLee, https://github.com/mianmaner, https://github.com/ShmilyYuQAQ]
+  role: Project Lead
+  description: A simple frontend text renderer developed with Vue3. Users provide articles, and the frontend handles the rendering. The syntax is similar to Markdown, so writing articles requires almost no HTML code. It supports multiple template syntaxes, offering users a simple and elegant text renderer.
+  notes: A Software Engineering course project, created to experience software engineering practices and to try applying compiler principles for article parsing (eventually abandoned QAQ — after finishing, I checked markdown-it source code and realized I overcomplicated things). Later, I switched to writing markdown-it plugins instead (fun and addictive).
+  github: https://github.com/Eira404/SakuraRendererVue

@@ -1,8 +1,8 @@
 import { PluginOption } from 'vite'
-import { copyFileSync, readFileSync, writeFileSync, mkdirSync, statSync } from 'node:fs'
-import { resolve } from 'node:path'
+import { copyFileSync, readFileSync, writeFileSync, mkdirSync, statSync, readdirSync } from 'node:fs'
+import { resolve, extname } from 'node:path'
 import fg from 'fast-glob'
-import { load, dump } from 'js-yaml'
+import { load } from 'js-yaml'
 import { pinyin } from 'pinyin-pro'
 
 const MD_DIR = 'C:/obsidian/研究生'
@@ -84,6 +84,80 @@ function decodeYamlToJson(path: string) {
   return json
 }
 
+function generateTsJson(outDir: string): string[] {
+  const SRC_DIR = 'data/ts-playground'
+  mkdirSync(outDir, { recursive: true })
+
+  const folders = readdirSync(SRC_DIR, { withFileTypes: true })
+  const dirNames: string[] = []
+
+  for (const entry of folders) {
+    if (!entry.isDirectory()) continue
+
+    const dirPath = resolve(SRC_DIR, entry.name)
+    const files = readdirSync(dirPath, { withFileTypes: true })
+
+    const jsonArr: { 'name': string; 'code': string }[] = []
+
+    for (const file of files) {
+      if (!file.isFile() || extname(file.name) !== '.ts') continue
+
+      const filePath = resolve(dirPath, file.name)
+      const content  = readFileSync(filePath, 'utf-8')
+
+      jsonArr.push({
+        'name': file.name,
+        'code': content
+      })
+    }
+
+    // 写 JSON
+    const outPath = resolve(outDir, `${entry.name}.json`)
+    writeFileSync(outPath, JSON.stringify(jsonArr, null, 2), 'utf-8')
+    dirNames.push(entry.name)
+  }
+  console.log('✅ TS Playground 已生成 JSON：', dirNames)
+  return dirNames
+}
+
+function generatePlaygroundJson(outDir: string): string[] {
+  const SRC_DIR = 'data/playground'
+  mkdirSync(outDir, { recursive: true })
+
+  const folders = readdirSync(SRC_DIR, { withFileTypes: true })
+  const dirNames: string[] = []
+
+  for (const entry of folders) {
+    if (!entry.isDirectory()) continue
+
+    const dirPath = resolve(SRC_DIR, entry.name)
+    const files = readdirSync(dirPath, { withFileTypes: true })
+
+    const jsonArr: { 'name': string; 'code': string; 'type': string }[] = []
+
+    for (const file of files) {
+      if (!file.isFile()) continue
+      const fileExtname = extname(file.name)
+      if (['.html', '.css', '.js', '.ts'].includes(fileExtname)) {
+        const filePath = resolve(dirPath, file.name)
+        const content  = readFileSync(filePath, 'utf-8')
+        jsonArr.push({
+          name: file.name,
+          code: content,
+          type: fileExtname.slice(1)
+        })
+      }
+    }
+
+    // 写 JSON
+    const outPath = resolve(outDir, `${entry.name}.json`)
+    writeFileSync(outPath, JSON.stringify(jsonArr, null, 2), 'utf-8')
+    dirNames.push(entry.name)
+  }
+  console.log('✅ Playground 已生成 JSON：', dirNames)
+  return dirNames
+}
+
 function buildRES(isDev: boolean) {
   const outDir = isDev
     ? resolve(DEV_RES_DIR)   // dev 时放在 public，自动挂载到 /
@@ -153,13 +227,25 @@ function buildRES(isDev: boolean) {
 
   const friends = decodeYamlToJson('data/friends.yml')
   const projects = decodeYamlToJson('data/projects.yml')
+  const projectsEn = decodeYamlToJson('data/projects-en.yml')
   const about = decodeYamlToJson('data/about.yml')
+  const aboutEn = decodeYamlToJson('data/about-en.yml')
+  const tsJsonList = generateTsJson(outDir + '/ts-playground')
+  const playgroundJsonList = generatePlaygroundJson(outDir + '/playground')
 
   const json = {
     docs: list,
     friends,
-    projects,
-    about
+    projects: {
+      'zh-CN': projects,
+      'en-US': projectsEn
+    },
+    about: {
+      'zh-CN': about,
+      'en-US': aboutEn
+    },
+    tsJsonList,
+    playgroundJsonList
   }
 
   writeFileSync(resolve(outDir, 'RES.json'), JSON.stringify(json, null, isDev ? 2 : 0))

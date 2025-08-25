@@ -46,6 +46,9 @@
     serif;
   scroll-margin-top: 70px;
 }
+.markdown-body a[id] {
+  scroll-margin-top: 70px;
+}
 .md-renderer--small {
   padding: 15px !important;
 }

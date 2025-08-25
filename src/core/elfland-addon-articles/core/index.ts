@@ -64,11 +64,11 @@ export class Articles extends ElflandAddon {
 
   constructor(elfland: Elfland) {
     super(elfland)
-
-    elfland.routerPromise.addCheck(this.check, this)
   }
 
-  logoutCallback(): void {}
+  loadedCallback(): void {
+    this.__elfland.routerPromise.addCheck(this.check, this)
+  }
 
   private async check(
     to: RouteLocationNormalized,

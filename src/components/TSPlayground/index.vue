@@ -51,7 +51,7 @@ const tsFile = computed({
 // Worker 与构建
 // 为避免打包器把 Worker 变成内联字符串，这里使用 new URL(..., import.meta.url)
 // 也可以改为 Vite 的 worker 语法：new Worker(new URL('...',{import.meta.url}), {type:'module'})
-const EsbuildWorker = new URL('../../worker/esbuild-worker.ts', import.meta.url)
+// const EsbuildWorker = new URL('@/worker/esbuild-worker.ts', import.meta.url)
 let worker: Worker | null = null
 // 控制台日志
 type LogLevel = 'log' | 'info' | 'warn' | 'error' | 'debug'
@@ -75,7 +75,7 @@ import { useElfland } from '@/core/elfland'
 let stopSandbox: null | (()=>void) = null
 
 onMounted(() => {
-  worker = new Worker(EsbuildWorker, { type: 'module' })
+  worker = new Worker(new URL('@/worker/esbuild-worker.ts', import.meta.url), { type: 'module' })
   worker.onmessage = async (e) => {
     const { type, payload, error } = e.data ?? {}
     if (type === 'bundle:ok') {

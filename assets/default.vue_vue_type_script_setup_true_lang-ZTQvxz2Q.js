@@ -1,1 +1,2 @@
 import{_ as e}from"./index.vue_vue_type_script_setup_true_lang-j0oNw2AB.js";import{M as t}from"./index-BMdWRKVK.js";import{a4 as n,a7 as c,aa as a,ac as o,aj as r,a8 as _}from"./vendor-lsvYFlz-.js";const i={class:"sticky top-0 z-10 w-full box-content"},l={class:"h-14"},m={class:"max-w-[1000px] mx-auto"},v=n({__name:"default",setup(d){return(s,p)=>(_(),c("div",null,[a("div",i,[a("div",l,[o(e)])]),a("div",m,[r(s.$slots,"main")]),a("div",null,[o(t)])]))}});export{v as _};
+//# sourceMappingURL=default.vue_vue_type_script_setup_true_lang-ZTQvxz2Q.js.map
